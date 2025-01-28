@@ -1,0 +1,26 @@
+server:
+  port: 9019
+
+grpc:
+  port: 8000
+
+spring:
+  application:
+    name: analyze-service
+
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5434/data_analyze
+    username: dbuser
+    password: dbpassword
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        hbm2ddl:
+          auto: update

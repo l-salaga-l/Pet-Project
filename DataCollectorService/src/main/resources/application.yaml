@@ -1,0 +1,24 @@
+server:
+  port: 9009
+
+spring:
+  application:
+    name: collector-service
+
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: report-created-events
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5435/data_collector
+    username: dbuser
+    password: dbpassword
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        hbm2ddl:
+          auto: update

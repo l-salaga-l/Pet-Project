@@ -1,0 +1,114 @@
+version: "3.8"
+
+services:
+  kafka:
+    image: bitnami/kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_KRAFT_CLUSTER_ID=FucoMbcoT_K35M1eu50XQg
+      - KAFKA_CFG_PROCESS_ROLES=controller, broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9091
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:29092,CONTROLLER://:9091,EXTERNAL://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:29092,EXTERNAL://${HOSTNAME:-localhost}:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    volumes:
+      - server-1:/bitnami/kafka
+
+  data_collector_db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: "data_collector"
+      POSTGRES_USER: "$USER"
+      POSTGRES_PASSWORD: "$PASSWORD"
+
+    ports:
+      - "5435:5432"
+
+    volumes:
+      - db_1:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg-isready U postgres" ]
+      start_period: 15s
+      timeout: 3s
+      interval: 10s
+      retries: 12
+
+  data_collector_service:
+    depends_on:
+      - data_collector_db
+      - kafka
+    build:
+      context: ./DataCollectorService
+    image: 'data_collector_service'
+    container_name: data_collector_service
+    restart: always
+    ports:
+      - "9009:9009"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:postgresql://data_collector_db:5432/data_collector?autoReconnect=true",
+        "spring.datasource.username" : "$USER",
+        "spring.datasource.password" : "$PASSWORD",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.PostgreSQLDialect",
+        "spring.jpa.hibernate.ddl-auto" : "update",
+        "spring.kafka.consumer.bootstrap-servers" : "kafka:29092",
+        "spring.kafka.consumer.group-id": "report-created-events"
+      }'
+
+
+  data_analyze_db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: "data_analyze"
+      POSTGRES_USER: "$USER"
+      POSTGRES_PASSWORD: "$PASSWORD"
+
+    ports:
+      - "5434:5432"
+
+    volumes:
+      - db_2:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg-isready U postgres" ]
+      start_period: 15s
+      timeout: 3s
+      interval: 10s
+      retries: 12
+
+  data_analyze_service:
+    depends_on:
+      - data_analyze_db
+      - kafka
+    build:
+      context: ./DataAnalyzeService
+    image: 'data_analyze_service'
+    container_name: data_analyze_service
+    restart: always
+    ports:
+      - "9019:9019"
+      - "8000:8000"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:postgresql://data_analyze_db:5432/data_analyze?autoReconnect=true",
+        "spring.datasource.username" : "$USER",
+        "spring.datasource.password" : "$PASSWORD",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.PostgreSQLDialect",
+        "spring.jpa.hibernate.ddl-auto" : "update",
+        "spring.kafka.producer.bootstrap-servers" : "kafka:29092"
+      }'
+
+volumes:
+  server-1:
+  db_1:
+  db_2:
+
+networks:
+  aston_microservices:
+    name: aston_microservices
+    external: true

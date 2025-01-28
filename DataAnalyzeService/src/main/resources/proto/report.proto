@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package proto;
+
+option java_package = "org.aston.proto";
+option java_multiple_files = true;
+
+message Input {
+  int32 pulse = 1;
+}
+
+message Output {
+  string result = 1;
+}
+
+service AnalyzeService {
+  rpc getResult(stream Input) returns (Output) {};
+}
