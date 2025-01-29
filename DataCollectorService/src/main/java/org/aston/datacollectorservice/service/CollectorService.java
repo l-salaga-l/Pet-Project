@@ -1,5 +1,7 @@
 package org.aston.datacollectorservice.service;
 
+import org.aston.datacollectorservice.dto.response.PulseAnalyzeResponseDto;
+
 public interface CollectorService {
-    String send();
+    PulseAnalyzeResponseDto collectPulseData();
 }

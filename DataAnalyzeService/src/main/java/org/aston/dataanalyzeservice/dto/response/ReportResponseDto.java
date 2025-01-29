@@ -13,6 +13,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class ReportResponseDto {
     private String title;
-    private String content;;
+    private String content;
     private LocalDate lastModifiedDate;
 }

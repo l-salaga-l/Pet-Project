@@ -10,8 +10,6 @@ import org.aston.dataanalyzeservice.model.Report;
 import org.aston.dataanalyzeservice.repository.ReportRepository;
 import org.aston.dataanalyzeservice.service.ReportService;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
