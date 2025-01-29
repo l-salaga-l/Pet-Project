@@ -14,5 +14,5 @@ import java.time.LocalDate;
 public class ReportResponseDto {
     private String title;
     private String content;;
-    private LocalDate updatedDate;
+    private LocalDate lastModifiedDate;
 }

@@ -11,5 +11,5 @@ import java.time.LocalDate;
 public class ReportCreatedEvent {
     private String reportId;
     private String reportName;
-    private LocalDate createdDate;
+    private LocalDate creationDate;
 }

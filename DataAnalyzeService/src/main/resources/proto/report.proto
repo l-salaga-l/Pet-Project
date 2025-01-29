@@ -10,7 +10,8 @@ message Input {
 }
 
 message Output {
-  string result = 1;
+  int32 avgPulse = 1;
+  string result = 2;
 }
 
 service AnalyzeService {

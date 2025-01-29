@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - include:
+      file: report.sql
+      relativeToChangelogFile: true
+  - changeSet:
+      id: 01.000.00
+      author: Damir Nurlygayanov
+      logicalFilePath: 01.000.00/db.changelog.yaml
+      changes:
+        - tagDatabase:
+            tag: 01.000.00
